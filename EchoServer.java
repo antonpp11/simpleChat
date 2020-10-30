@@ -74,6 +74,13 @@ public class EchoServer extends AbstractServer
   
   //Class methods ***************************************************
   
+  protected void clientConnected(ConnectionToClient client) {
+	  System.out.println("Client disconnected");
+  }
+  protected void clientDisconnected(ConnectionToClient client) {
+	  System.out.println("Client disconnected");
+  }
+  
   /**
    * This method is responsible for the creation of 
    * the server instance (there is no UI in this phase).
@@ -104,6 +111,11 @@ public class EchoServer extends AbstractServer
     {
       System.out.println("ERROR - Could not listen for clients!");
     }
+  }
+  
+  
+  public class ServerConsole {
+	  Scanner fromConsole;
   }
 }
 //End of EchoServer class

@@ -86,7 +86,14 @@ public class ClientConsole implements ChatIF
       while (true) 
       {
         message = fromConsole.nextLine();
-        client.handleMessageFromClientUI(message);
+        
+        if (message.replaceAll("\\s+","").startsWith("#")) {
+        	handleCommand(message);
+        }
+        else {
+        	client.handleMessageFromClientUI(message);
+        	message = "";
+        }
       }
     } 
     catch (Exception ex) 
@@ -106,6 +113,53 @@ public class ClientConsole implements ChatIF
   {
     System.out.println("> " + message);
   }
+  
+  public void handleCommand(String message) throws IOException {
+	  
+	  message = message.substring(1);
+	  if (message.equals("quit")) {
+		  client.closeConnection();
+		  System.exit(0);
+	  }
+	  else if (message.equals("logoff")) {
+		  client.closeConnection();
+	  }
+	  else if (message.contains("sethost")) {
+		  if (client.isConnected()) {
+			  System.out.println("ERROR - You have to be disconnected to set the host.");
+		  }
+		  else {
+			  String host = message.replaceAll("sethost<", "").replaceAll(">", "");
+			  client.setHost(host);
+		  }
+	  }
+	  else if (message.contains("setport")) {
+		  if (client.isConnected()) {
+			  System.out.println("ERROR - You have to be disconnected to set the port.");
+		  }
+		  else {
+			  int port =Integer.parseInt(message.replaceAll("setport<", "").replaceAll(">", ""));
+			  client.setPort(port);
+		  }
+	  }
+	  else if (message.equals("login")) {
+		  if (client.isConnected()) {
+			  System.out.println("ERROR - You have to be disconnected to login");
+		  }
+		  else {
+			  client.run();
+		  }
+	  }
+	  else if(message.equals("gethost")) {
+		  System.out.println(client.getHost());
+	  }
+	  else if(message.equals("getport")) {
+		  System.out.println(client.getPort());
+	  }
+	  else {
+		  System.out.println("ERROR - '" + message + "' is not a valid command");
+	  }
+  }
 
   
   //Class methods ***************************************************
@@ -118,17 +172,25 @@ public class ClientConsole implements ChatIF
   public static void main(String[] args) 
   {
     String host = "";
+    int port = DEFAULT_PORT;
 
 
     try
     {
       host = args[0];
+      try {
+    	  port = Integer.parseInt(args[1]); 
+      }
+      catch(ArrayIndexOutOfBoundsException e) {
+    	  port = DEFAULT_PORT;
+      }
+      // get the port number from command line
     }
     catch(ArrayIndexOutOfBoundsException e)
     {
       host = "localhost";
     }
-    ClientConsole chat= new ClientConsole(host, DEFAULT_PORT);
+    ClientConsole chat= new ClientConsole(host, port);
     chat.accept();  //Wait for console data
   }
 }
